@@ -2,8 +2,7 @@
 import csv
 import sys
 
-def filter_dict_header(header):
-	#Setting default values. But it still should find what is the correct position
+def generate_header_dict(header):
 	header_dict = {}
 	values_of_interest = ['tn', 'date', 'history_type_id', 'name', 'service', 'create_time']
 	
@@ -17,26 +16,39 @@ def filter_dict_header(header):
 
 	return header_dict
 
-def main(file_path):
-	csv_file = open(file_path, 'rt')
-
-	reader = csv.reader(csv_file, delimiter=';')
-	row_counter = 0
-
+def write_filtred_csv(reader):
 	status_change_flags = ['27', '28']
+	output_file = open('filtred_tickets.csv', 'wt')
+	writer = csv.writer(output_file, delimiter=';')
+	row_counter = 0
 
 	for row in reader:
 		if row_counter == 0:
 			header = row
-			header_dict = filter_dict_header(header)
+			header_dict = generate_header_dict(header)
+			row_counter += 1
+			header =  ['tn', 'date', 'history_type_id', 'name', 'service', 'create_time']
+			writer.writerow(header)
 
 		elif row[header_dict['history_type_id']] in status_change_flags:
-			print('row# ' + str(row_counter + 1) + ' ' + row[header_dict['name']])
+			col_number = 0
+			filtred_row = []
+			for col in row:
+				if col_number in header_dict.values():
+					print('value to be printed: ' + row[col_number])
+					filtred_row.append(row[col_number])
 
-		row_counter += 1
+				col_number += 1
 
-		if row_counter > 100:
-			break
+			print('filtred_row after for: ' + str(filtred_row))
+			writer.writerow(filtred_row)
+
+	output_file.close()
+
+def main(file_path):
+	csv_file = open(file_path, 'rt')
+	reader = csv.reader(csv_file, delimiter=';')
+	write_filtred_csv(reader)
 
 	csv_file.close()
 
