@@ -1,19 +1,10 @@
-#!/usr/bin/python3
 import csv
-import sys
+from files_handler import close_files
 
-def generate_header_dict(header):
-	header_dict = {}
-	values_of_interest = ['tn', 'date', 'history_type_id', 'name', 'service', 'create_time']
-	
-	x = 0
+def get_reader_csv(csv_file):
+	reader = csv.reader(csv_file, delimiter=';')
 
-	while(x < len(header)):
-		if header[x] in values_of_interest:
-			header_dict[header[x]] = x
-		x += 1
-
-	return header_dict
+	return reader
 
 def write_row(writers_dict, header_dict, row):
 	col_number = 0
@@ -24,17 +15,6 @@ def write_row(writers_dict, header_dict, row):
 
 		col_number += 1
 	writers_dict['default'].writerow(filtred_row)
-
-def close_files(output_files_dict):
-	dict_values = list(output_files_dict.values())
-	print(len(dict_values))
-
-
-	x = 0
-
-	while(x < len(dict_values)):
-		dict_values[x].close()
-		x += 1
 
 def write_filtred_csv(reader):
 	status_change_flags = ['27', '28']
@@ -57,15 +37,15 @@ def write_filtred_csv(reader):
 
 	close_files(output_files_dict)
 
-def main(file_path):
-	csv_file = open(file_path, 'rt')
-	reader = csv.reader(csv_file, delimiter=';')
-	write_filtred_csv(reader)
+def generate_header_dict(header):
+	header_dict = {}
+	values_of_interest = ['tn', 'date', 'history_type_id', 'name', 'service', 'create_time']
+	
+	x = 0
 
-	csv_file.close()
+	while(x < len(header)):
+		if header[x] in values_of_interest:
+			header_dict[header[x]] = x
+		x += 1
 
-if __name__ == "__main__":
-	if len(sys.argv) > 1:
-		main(sys.argv[1])
-	else:
-		print("Insufficient arguments. Please, set the csv file path.")
+	return header_dict
